@@ -33,12 +33,16 @@ class Dat2Html:
         filesize = len("".join(lines))
 
         params = {
-            "title": title, "filename": filename_noext, "count": count,
+            "title": title,
+            "filename": filename_noext,
+            "count": count,
             "link_all": self.get_link_all(filename_noext),
             "link_last50": self.get_link_last50(count, self.template_dir),
             "link_pager": self.get_link_pager(count, self.template_dir),
             "skin_path": self.get_skin_path(),
-            "filesize": filesize, "filesize2": filesize / 1024}
+            "filesize": filesize,
+            "filesize2": filesize / 1024,
+        }
 
         output += self.template_header % params
 
@@ -289,7 +293,7 @@ class Dat2Html:
         correct_scheme = lambda x: 'http' if x == 'ttp' else \
                                   ('https' if x == 'ttps' else x)
         message = p.sub(
-            lambda x: '%(before)s<a href="%(scheme)s%(body)s" target="_blank">'
+            lambda x: '%(before)s<a href="%(scheme)s%(body)s" rel="noopener noreferrer"  target="_blank">'
             '%(raw_scheme)s%(body)s</a>' %
             {'before': x.group(1), 'raw_scheme': x.group(2),
              'body': x.group(3), 'scheme': correct_scheme(x.group(2))},
