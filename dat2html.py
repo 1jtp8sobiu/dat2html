@@ -97,7 +97,7 @@ class Dat2Html:
                 output_file = "stdout"
                 sys.stdout.write(output)
             else:
-                f = open(output_file, "w", newline="\n", encoding="utf-8")
+                f = open(output_file, "w", encoding="cp932")
                 f.write(output)
                 f.close()
         except:
@@ -159,13 +159,14 @@ class Dat2Html:
 
     def get_template_header(self):
         if self.template_dir == "*text*":
-            s = "%(title)s\n\n"
+            s = "%(title)s\r\n\r\n"
         elif self.template_exists():
             s = self.read_template("header.html")
             s = s.replace("<THREADNAME/>", "%(title)s")
             s = s.replace("<THREADURL/>", "")
             s = s.replace("<SKINPATH/>", "%(skin_path)s")
             s = s.replace("<GETRESCOUNT/>", "%(count)s")
+            s = s.replace("<CHARSET/>", "Shift_JIS")
             s = s.replace("<LINK_BACKTOINDEX/>", "")
             s = s.replace("<LINK_BACKTOBOARD/>", "")
             s = s.replace("<LINK_SOURCETHREAD/>", "")
@@ -174,33 +175,34 @@ class Dat2Html:
             s = s.replace("<LINK_LASTFIFTY/>", "%(link_last50)s")
         else:
             s = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
-                "Transitional//EN\">\n" \
-                "<html>\n" \
-                "<head>\n" \
-                "<meta http-equiv=\"Content-Type\" content=\"text/html>" \
-                "<meta name=\"Author\" content=\"%(filename)s\">\n" \
-                "<title>%(title)s</title>\n" \
-                "</head>\n" \
+                "Transitional//EN\">\r\n" \
+                "<html>\r\n" \
+                "<head>\r\n" \
+                "<meta http-equiv=\"Content-Type\" content=\"text/html; " \
+                "charset=Shift_JIS\">\r\n" \
+                "<meta name=\"Author\" content=\"%(filename)s\">\r\n" \
+                "<title>%(title)s</title>\r\n" \
+                "</head>\r\n" \
                 "<body bgcolor=#efefef text=black link=blue alink=red " \
-                "vlink=#660099>\n" \
+                "vlink=#660099>\r\n" \
                 "<div style=\"margin-top:1em;\">" \
-                "<span style='float:left;'>\n" \
-                "%(link_all)s %(link_pager)s %(link_last50)s\n" \
-                "</span>&nbsp;</div>\n" \
+                "<span style='float:left;'>\r\n" \
+                "%(link_all)s %(link_pager)s %(link_last50)s\r\n" \
+                "</span>&nbsp;</div>\r\n" \
                 "<hr style=\"background-color:#888;color:#888;" \
                 "border-width:0;height:1px;position:relative;" \
-                "top:-.4em;\">\n" \
+                "top:-.4em;\">\r\n" \
                 "<h1 style=\"color:red;font-size:larger;font-weight:normal;" \
-                "margin:-.5em 0 0;\">%(title)s</h1>\n" \
-                "<dl class=\"thread\">\n"
+                "margin:-.5em 0 0;\">%(title)s</h1>\r\n" \
+                "<dl class=\"thread\">\r\n"
         # s = s.decode("utf-8").encode("cp932")
         # s = s.encode("cp932")
         return s
 
     def get_template_body(self):
         if self.template_dir == "*text*":
-            s = "%(number)s 名前：%(name2)s ：%(date)s\n" \
-                "%(message)s\n\n"
+            s = "%(number)s 名前：%(name2)s ：%(date)s\r\n" \
+                "%(message)s\r\n\r\n"
         elif self.template_exists():
             s = self.read_template("res.html")
             s = s.replace("<NUMBER/>", "<a href=\"menu\:%(number)s\" "
@@ -214,7 +216,7 @@ class Dat2Html:
         else:
             s = "<dt><a name=\"R%(number)s\">%(number)s</a> " \
                 "名前：%(name2)s：" \
-                "%(date)s<dd>%(message)s<br><br>\n"
+                "%(date)s<dd>%(message)s<br><br>\r\n"
             # s = s.decode("utf-8").encode("cp932")
             # s = s.encode("cp932")
         return s
@@ -235,12 +237,12 @@ class Dat2Html:
             s = s.replace("<BBSNAME/>", "").replace("<BOARDNAME/>", "")
             s = s.replace("<BOARDURL/>", "")
         else:
-            s = "</dl>\n" \
-                "<hr>\n" \
-                "%(link_all)s\n" \
-                " %(link_last50)s\n" \
-                "</body>\n" \
-                "</html>\n"
+            s = "</dl>\r\n" \
+                "<hr>\r\n" \
+                "%(link_all)s\r\n" \
+                " %(link_last50)s\r\n" \
+                "</body>\r\n" \
+                "</html>\r\n"
             # s = s.decode("utf-8").encode("cp932")
             # s = s.encode("cp932")
         return s
@@ -251,12 +253,12 @@ class Dat2Html:
             r'target="_blank">([^<]+)</a>')
         message = p.sub(r'\1', message)
 
-        message = re.compile(r'<br>').sub("\n", message)
-        message = re.compile(r' ?\n ?').sub("\n", message)
+        message = re.compile(r'<br>').sub("\r\n", message)
+        message = re.compile(r' ?\r\n ?').sub("\r\n", message)
         message = re.compile(r'^([^ ])').sub(r' \1', message)
         message = re.compile(r'^ ').sub("      ", message)
         message = re.compile(r' $').sub("", message)
-        message = re.compile('\n').sub("\n      ", message)
+        message = re.compile('\r\n').sub("\r\n      ", message)
         message = message.replace("&lt;", "<").replace("&gt;", ">")
         message = message.replace("&nbsp;", " ").replace("&quot;", "\"")
         message = message.replace("&amp;", "&")
@@ -386,34 +388,33 @@ def make_index(input_files, output_dir):
         logging.warning("%s already exists. Overwriting ..." % index_file)
 
     output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
-        "Transitional//EN\">\n" \
-        "<html>\n" \
-        "<head>\n" \
-        "<meta http-equiv=\"Content-Type\" content=\"text/html>" \
-        "<meta http-equiv=\"Content-Style-Type\" content=\"text/css\">\n" \
-        "<title>BBS_log</title>\n" \
-        "</head>\n" \
+        "Transitional//EN\">\r\n" \
+        "<html>\r\n" \
+        "<head>\r\n" \
+        "<meta http-equiv=\"Content-Type\" content=\"text/html; " \
+        "charset=Shift_JIS\">\r\n" \
+        "<meta http-equiv=\"Content-Style-Type\" content=\"text/css\">\r\n" \
+        "<title>BBS_log</title>\r\n" \
+        "</head>\r\n" \
         "<body bgcolor=\"#efefef\" text=\"black\" link=\"blue\" " \
-        "alink=\"red\" vlink=\"#660099\">\n" \
-        "<div style=\"margin-bottom:0.5em;\"></div>\n" \
-        "<div style=\"margin-bottom:1em;\">\n"
+        "alink=\"red\" vlink=\"#660099\">\r\n" \
+        "<div style=\"margin-bottom:0.5em;\"></div>\r\n" \
+        "<div style=\"margin-bottom:1em;\">\r\n"
 
     number = 1
     for filename in input_files:
         try:
-            first_line = open_file(filename).readline()
-            title = get_title(first_line)
-            date_time = get_date_time(first_line)
-            dat_path = os.path.basename(filename)
-            html_path = os.path.basename(filename).replace(".dat", ".html")
+            title = get_title(open_file(filename).readline())
+            path = os.path.basename(filename).replace(".dat", ".html")
+            path = path
             count = len(open_file(filename).readlines())
-            output += (" %s / <a href=\"%s\">html</a> / <a href=\"%s\">dat</a> / %s(%s)<br>\n"
-                        % (date_time, html_path, dat_path, title, count))
+            output += ("　<a href=\"%s\">%s：%s(%s)</a><br>\r\n"
+                        % (path, number, title, count))
             number += 1
         except UnicodeDecodeError:
             continue
 
-    output += "</div>\n</body>\n</html>\n"
+    output += "</div>\r\n</body>\r\n</html>\r\n"
 
     logging.info("Generating %s" % index_file)
     try:
@@ -421,7 +422,7 @@ def make_index(input_files, output_dir):
             index_file = "stdout"
             sys.stdout.write(output)
         else:
-            f = open(index_file, "w", newline="\n", encoding="utf-8")
+            f = open(index_file, "w", encoding="cp932")
             f.write(output)
             f.close()
     except IOError as xxx_todo_changeme1:
@@ -442,7 +443,7 @@ def make_subject(input_files, output_dir):
     for filename in input_files:
         title = get_title(open_file(filename).readline())
         count = len(open_file(filename).readlines())
-        output += ("%s<>%s (%s)\n" %
+        output += ("%s<>%s (%s)\r\n" %
                    (os.path.basename(filename), title, count))
 
     try:
@@ -463,20 +464,11 @@ def make_subject(input_files, output_dir):
 
 def get_title(line):
     try:
-        title = line.split("<>")[4].rstrip("\n")
+        title = line.split("<>")[4].rstrip("\r\n")
     except IndexError:
         logging.warning("Could not get title")
         return "(Untitled)"
     return title
-
-
-def get_date_time(line):
-    try:
-        date_time = line.split("<>")[2]
-    except IndexError:
-        logging.warning("Could not get datetime")
-        return ""
-    return date_time[0:22]
 
 
 def auto_link(message, use_template=False):
