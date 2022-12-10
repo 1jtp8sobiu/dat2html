@@ -57,10 +57,9 @@ class Dat2Html:
                 message = self.html2text(message)
             else:
                 message = self.auto_link(message, self.template_dir)
-
             name2 = "<font color=green><b>%s</b></font>" % name
             if email != "":
-                name2 = "<a href=\"mailto:%s\"><b>%s</b></a>" % (email, name)
+                name2 = "<font color=blue><b>%s</b></font> [%s]" % (name, email)         
             if self.template_dir == "*text*":
                 name2 = "%s" % name
             if self.template_dir == "*text*" and email != "":
@@ -293,7 +292,7 @@ class Dat2Html:
         correct_scheme = lambda x: 'http' if x == 'ttp' else \
                                   ('https' if x == 'ttps' else x)
         message = p.sub(
-            lambda x: '%(before)s<a href="%(scheme)s%(body)s" rel="noopener noreferrer"  target="_blank">'
+            lambda x: '%(before)s<a href="%(scheme)s%(body)s" rel="noopener noreferrer" target="_blank">'
             '%(raw_scheme)s%(body)s</a>' %
             {'before': x.group(1), 'raw_scheme': x.group(2),
              'body': x.group(3), 'scheme': correct_scheme(x.group(2))},
