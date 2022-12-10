@@ -44,8 +44,8 @@ class Dat2Html:
             "filesize2": filesize / 1024,
         }
 
+        anker_count = self.get_anker_count(lines)
         output += self.template_header % params
-
         number = 1
         for line in lines:
             try:
@@ -57,9 +57,21 @@ class Dat2Html:
                 message = self.html2text(message)
             else:
                 message = self.auto_link(message, self.template_dir)
+
+            prefix = ""
+            if not self.template_dir:
+                prefix = "R"
+            if number in anker_count:
+                tmp = []
+                for num in anker_count[number]:
+                    tmp.append(f'<a href="#{prefix}{num}">{num}</a>') 
+                anker_str = ", ".join(tmp)
+                anker_str = '<font size="2">(' + anker_str + ')</font>'
+                message = anker_str + "<br>" + message
+
             name2 = "<font color=green><b>%s</b></font>" % name
             if email != "":
-                name2 = "<font color=blue><b>%s</b></font> [%s]" % (name, email)         
+                name2 = "<font color=blue><b>%s</b></font> [%s]" % (name, email)
             if self.template_dir == "*text*":
                 name2 = "%s" % name
             if self.template_dir == "*text*" and email != "":
@@ -299,6 +311,18 @@ class Dat2Html:
             message)
 
         return message
+
+    def get_anker_count(self, lines):
+        anker_count = {}
+        for i, line in enumerate(lines, 1):
+            ankers = re.findall(r'&gt;&gt;[0-9]{1,3}', line)
+            for anker in ankers:
+                anker_target = int(anker.replace('&gt;&gt;', ''))
+                if anker_target in anker_count:
+                    anker_count[anker_target].append(i)
+                else:
+                    anker_count[anker_target] = [i]
+        return anker_count
 
     def get_skin_path(self):
         skin_path = ""
