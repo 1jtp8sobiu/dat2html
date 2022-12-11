@@ -413,6 +413,8 @@ def make_index(input_files, output_dir):
         logging.info("%s already exists. Adding new threads ..." % index_file)
         with open(index_file, encoding='utf-8') as f:
             existing_threads = f.read().split('<div style="margin-bottom:1em;">\n')[1].split('</div>')[0]
+    else:
+        existing_threads = ''
 
     output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
         "Transitional//EN\">\n" \
@@ -436,7 +438,7 @@ def make_index(input_files, output_dir):
             dat_path = os.path.basename(filename)
             html_path = os.path.basename(filename).replace(".dat", ".html")
             count = len(open_file(filename).readlines())
-            output += (" %s / <a href=\"%s\">html</a> / <a href=\"%s\">dat</a> / %s(%s)<br>\n"
+            output += (" %s / <a href=\"html/%s\">html</a> / <a href=\"dat/%s\">dat</a> / %s(%s)<br>\n"
                         % (date_time, html_path, dat_path, title, count))
             number += 1
         except UnicodeDecodeError:
