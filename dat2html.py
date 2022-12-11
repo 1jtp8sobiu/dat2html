@@ -398,19 +398,21 @@ def sort_nicely(l):
     """
     convert = lambda text: int(text) if text.isdigit() else text
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
-    return l.sort(key=alphanum_key)
+    return l.sort(key=alphanum_key, reverse=True)
 
 
 def open_file(filename):
     if filename.endswith(".gz"):
-        return gzip.open(filename, encoding="cp932")
-    return open(filename, encoding="cp932")
+        return gzip.open(filename, encoding="cp932" errors="ignore")
+    return open(filename, encoding="cp932", errors="ignore")
 
 
 def make_index(input_files, output_dir):
     index_file = os.path.join(output_dir, "index.html")
     if os.path.exists(index_file):
-        logging.warning("%s already exists. Overwriting ..." % index_file)
+        logging.info("%s already exists. Adding new threads ..." % index_file)
+        with open(index_file, encoding='utf-8') as f:
+            existing_threads = f.read().split('<div style="margin-bottom:1em;">\n')[1].split('</div>')[0]
 
     output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
         "Transitional//EN\">\n" \
@@ -438,8 +440,10 @@ def make_index(input_files, output_dir):
                         % (date_time, html_path, dat_path, title, count))
             number += 1
         except UnicodeDecodeError:
+            logging.warning("UnicodeDecodeError %s ..." % filename)
             continue
 
+    output += existing_threads
     output += "</div>\n</body>\n</html>\n"
 
     logging.info("Generating %s" % index_file)
