@@ -403,7 +403,7 @@ def sort_nicely(l):
 
 def open_file(filename):
     if filename.endswith(".gz"):
-        return gzip.open(filename, encoding="cp932" errors="ignore")
+        return gzip.open(filename, encoding="cp932", errors="ignore")
     return open(filename, encoding="cp932", errors="ignore")
 
 
