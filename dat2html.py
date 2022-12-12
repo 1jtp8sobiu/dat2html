@@ -122,7 +122,7 @@ class Dat2Html:
         return True
 
     def convert_files(self, input_files, output_dir,
-                      index=False, subject=False):
+                      index='index.html', subject=False):
         filenames = get_filenames(input_files)
 
         if len(filenames) <= 0:
@@ -146,7 +146,7 @@ class Dat2Html:
             self.convert_file(filename, output_dir)
 
         if index:
-            make_index(filenames, output_dir)
+            make_index(input_files=filenames, output_dir=output_dir, index=index)
         if subject:
             make_subject(filenames, output_dir)
 
@@ -367,9 +367,9 @@ def convert_file(input_file, output_dir, template_dir=None):
 
 
 def convert_files(input_files, output_dir, template_dir=None,
-                  index=False, subject=False):
+                  index="index.html", subject=False):
     dat2html = Dat2Html(template_dir)
-    return dat2html.convert_files(input_files, output_dir, index, subject)
+    return dat2html.convert_files(input_files=input_files, output_dir=output_dir, index=index, subject=subject)
 
 
 def get_filenames(input_files):
@@ -407,8 +407,8 @@ def open_file(filename):
     return open(filename, encoding="cp932", errors="ignore")
 
 
-def make_index(input_files, output_dir):
-    index_file = os.path.join(output_dir, "index.html")
+def make_index(input_files, output_dir, index):
+    index_file = index
     if os.path.exists(index_file):
         logging.info("%s already exists. Adding new threads ..." % index_file)
         with open(index_file, encoding='utf-8') as f:
@@ -533,7 +533,7 @@ def print_help():
     print("  --template        specify the template directory")
     print("  -o, --output      specify the output directory")
     print("  --text            convert to text format instead of HTML")
-    print("  --index           generate an index file")
+    print("  --index           generate an index file (specify the filename)")
     print("  --subject         generate a subject.txt file")
     print("  -q, --quiet       suppress warning and info messages")
     print("  -v, --verbose     print debugging messages")
@@ -548,7 +548,7 @@ def print_version():
 def main():
     template_dir = None
     output_dir = os.getcwd()
-    index = False
+    index = "index.html"
     subject = False
     log_level = logging.INFO
 
@@ -556,7 +556,7 @@ def main():
         opts, args = getopt.getopt(
             sys.argv[1:],
             "o:qhvV",
-            ["template=", "output=", "text", "index", "subject",
+            ["template=", "output=", "text", "index=", "subject",
              "quiet", "verbose", "help", "version"])
     except getopt.GetoptError:
         print_help()
@@ -570,7 +570,7 @@ def main():
         if opt == "--text":
             template_dir = "*text*"
         if opt == "--index":
-            index = True
+            index = value
         if opt == "--subject":
             subject = True
         if opt in ("-q", "--quiet"):
@@ -599,7 +599,7 @@ def main():
         output = convert(sys.stdin.readlines(), "%(filename)s", template_dir)
         print(output, end=' ')
     else:
-        convert_files(args, output_dir, template_dir, index, subject)
+        convert_files(args, output_dir=output_dir, template_dir=template_dir, index=index, subject=subject)
 
 
 if __name__ == "__main__":
