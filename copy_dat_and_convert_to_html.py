@@ -84,7 +84,6 @@ while True:
         
     for check_board in check_boards:
         copy_src = 'X:/python_tools/5ch_scrape'
-        # copy_src = 'Y:/dat2html-gtk-0.5.0/mercury.bbspink.com/livemegami/_'
         copy_dst = f'{check_board}/dat'
 
         board_name = check_board.split('/')[1]
