@@ -146,7 +146,7 @@ class Dat2Html:
             self.convert_file(filename, output_dir)
 
         if index:
-            make_index(input_files=filename, index=index)
+            make_index(input_files=filenames, index=index)
         if subject:
             make_subject(filenames, output_dir)
 
@@ -188,26 +188,41 @@ class Dat2Html:
             s = s.replace("<LINK_RESNUMBER/>", "%(link_pager)s")
             s = s.replace("<LINK_LASTFIFTY/>", "%(link_last50)s")
         else:
-            s = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
-                "Transitional//EN\">\n" \
-                "<html>\n" \
-                "<head>\n" \
-                "<meta http-equiv=\"Content-Type\" content=\"text/html>" \
-                "<meta name=\"Author\" content=\"%(filename)s\">\n" \
-                "<title>%(title)s</title>\n" \
-                "</head>\n" \
-                "<body bgcolor=#efefef text=black link=blue alink=red " \
-                "vlink=#660099>\n" \
-                "<div style=\"margin-top:1em;\">" \
-                "<span style='float:left;'>\n" \
-                "%(link_all)s %(link_pager)s %(link_last50)s\n" \
-                "</span>&nbsp;</div>\n" \
-                "<hr style=\"background-color:#888;color:#888;" \
-                "border-width:0;height:1px;position:relative;" \
-                "top:-.4em;\">\n" \
-                "<h1 style=\"color:red;font-size:larger;font-weight:normal;" \
-                "margin:-.5em 0 0;\">%(title)s</h1>\n" \
-                "<dl class=\"thread\">\n"
+            # s = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
+                # "Transitional//EN\">\n" \
+                # "<html>\n" \
+                # "<head>\n" \
+                # "<meta http-equiv=\"Content-Type\" content=\"text/html>" \
+                # "<meta name=\"Author\" content=\"%(filename)s\">\n" \
+                # "<title>%(title)s</title>\n" \
+                # "</head>\n" \
+                # "<body bgcolor=#efefef text=black link=blue alink=red " \
+                # "vlink=#660099>\n" \
+                # "<div style=\"margin-top:1em;\">" \
+                # "<span style='float:left;'>\n" \
+                # "%(link_all)s %(link_pager)s %(link_last50)s\n" \
+                # "</span>&nbsp;</div>\n" \
+                # "<hr style=\"background-color:#888;color:#888;" \
+                # "border-width:0;height:1px;position:relative;" \
+                # "top:-.4em;\">\n" \
+                # "<h1 style=\"color:red;font-size:larger;font-weight:normal;" \
+                # "margin:-.5em 0 0;\">%(title)s</h1>\n" \
+                # "<dl class=\"thread\">\n"
+
+            s = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
+            s += "<html>\n"
+            s += "<head>\n" 
+            s += get_gtag_code()
+            s += "<meta http-equiv=\"Content-Type\" content=\"text/html><meta name=\"Author\" content=\"%(filename)s\">\n"
+            s += "<title>%(title)s</title>\n"
+            s += "</head>\n"
+            s += "<body bgcolor=#efefef text=black link=blue alink=red vlink=#660099>\n"
+            s += "<div style=\"margin-top:1em;\"><span style='float:left;'>\n"
+            s += "%(link_all)s %(link_pager)s %(link_last50)s\n"
+            s += "</span>&nbsp;</div>\n"
+            s += "<hr style=\"background-color:#888;color:#888;border-width:0;height:1px;position:relative;top:-.4em;\">\n"
+            s += "<h1 style=\"color:red;font-size:larger;font-weight:normal;margin:-.5em 0 0;\">%(title)s</h1>\n"
+            s += "<dl class=\"thread\">\n"
         # s = s.decode("utf-8").encode("cp932")
         # s = s.encode("cp932")
         return s
