@@ -77,59 +77,62 @@ def save_dat_kakolog_data(path, obj):
         obj.sort()
         f.write('\n'.join(obj))
 
-
-while True:
-    with open('boards.txt') as f:
-        check_boards = f.read().splitlines()
-        
-    for check_board in check_boards:
-        copy_src = 'X:/python_tools/5ch_scrape'
-        copy_dst = f'{check_board}/dat'
-
-        board_name = check_board.split('/')[1]
-        server = check_board.split('/')[0].split('.')[0]
-
-        start = time.perf_counter()
-        dats_on_s = pathlib.Path(copy_src).glob(f'{server}_{board_name}_*.dat')
-        dats_on_s = list(dats_on_s)
-        dats_on_s.sort()
-        print(time.perf_counter() - start)
-
-        # copy dat from the server to local
-        count = 0
-        added_dats = []
-        dat_kakolog_data = load_dat_kakolog_data(check_board)
-        for dat_on_s in dats_on_s:
-            dat_id = dat_on_s.stem.split('_')[-1]
+def main()
+    while True:
+        with open('boards.txt') as f:
+            check_boards = f.read().splitlines()
             
-            if dat_id.startswith('9'):
-                continue
-            if dat_id in dat_kakolog_data:
-                continue
+        for check_board in check_boards:
+            copy_src = 'X:/python_tools/5ch_scrape'
+            copy_dst = f'{check_board}/dat'
+    
+            board_name = check_board.split('/')[1]
+            server = check_board.split('/')[0].split('.')[0]
+    
+            start = time.perf_counter()
+            dats_on_s = pathlib.Path(copy_src).glob(f'{server}_{board_name}_*.dat')
+            dats_on_s = list(dats_on_s)
+            dats_on_s.sort()
+            print(time.perf_counter() - start)
+    
+            # copy dat from the server to local
+            count = 0
+            added_dats = []
+            dat_kakolog_data = load_dat_kakolog_data(check_board)
+            for dat_on_s in dats_on_s:
+                dat_id = dat_on_s.stem.split('_')[-1]
+                
+                if dat_id.startswith('9'):
+                    continue
+                if dat_id in dat_kakolog_data:
+                    continue
+    
+                dat_on_s_info = os.stat(dat_on_s)
+                dat_on_s_lastmod = dat_on_s_info.st_mtime
+    
+                if time.time() - dat_on_s_lastmod > CHECK_INTERVEL:
+                    dat_kakolog_data.add(dat_id)
+                    print(datetime.datetime.fromtimestamp(int(dat_on_s_lastmod)))
+    
+                    dat_on_l = f'{check_board}/dat/{dat_id}.dat'
+                    shutil.copy2(dat_on_s, dat_on_l)
+                    added_dats.append(dat_on_l)
+                    count += 1
+                    if count == 200:
+                        save_dat_kakolog_data(check_board, dat_kakolog_data)
+                        dat_2_html(check_board, added_dats)
+                        make_root_index(check_board)
+                        git_push()
+                        count = 0
+                        added_dats = []
+                        print('wating 600')
+                        time.sleep(600)
+            save_dat_kakolog_data(check_board, dat_kakolog_data)
+            dat_2_html(check_board, added_dats)
+            make_root_index(check_board)
+            git_push()
+            print('wating', CHECK_INTERVEL)
+            time.sleep(CHECK_INTERVEL)
 
-            dat_on_s_info = os.stat(dat_on_s)
-            dat_on_s_lastmod = dat_on_s_info.st_mtime
-
-            if time.time() - dat_on_s_lastmod > CHECK_INTERVEL:
-                dat_kakolog_data.add(dat_id)
-                print(datetime.datetime.fromtimestamp(int(dat_on_s_lastmod)))
-
-                dat_on_l = f'{check_board}/dat/{dat_id}.dat'
-                shutil.copy2(dat_on_s, dat_on_l)
-                added_dats.append(dat_on_l)
-                count += 1
-                if count == 50:
-                    save_dat_kakolog_data(check_board, dat_kakolog_data)
-                    dat_2_html(check_board, added_dats)
-                    make_root_index(check_board)
-                    git_push()
-                    count = 0
-                    added_dats = []
-                    print('wating 30')
-                    time.sleep(30)
-        save_dat_kakolog_data(check_board, dat_kakolog_data)
-        dat_2_html(check_board, added_dats)
-        make_root_index(check_board)
-        git_push()
-        print('wating', CHECK_INTERVEL)
-        time.sleep(CHECK_INTERVEL)
+if __name__ == "__main__":
+    main()
