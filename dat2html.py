@@ -474,13 +474,9 @@ def make_index(input_files, index):
 
     logging.info("Generating %s" % index_file)
     try:
-        if output_dir == "-":
-            index_file = "stdout"
-            sys.stdout.write(output)
-        else:
-            f = open(index_file, "w", newline="\n", encoding="utf-8")
-            f.write(output)
-            f.close()
+        f = open(index_file, "w", newline="\n", encoding="utf-8")
+        f.write(output)
+        f.close()
     except IOError as xxx_todo_changeme1:
         (errorno, strerror) = xxx_todo_changeme1.args
         logging.error("Failed to write %s: %s" % (index_file, strerror))
