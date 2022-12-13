@@ -146,7 +146,7 @@ class Dat2Html:
             self.convert_file(filename, output_dir)
 
         if index:
-            make_index(input_files=filenames, output_dir=output_dir, index=index)
+            make_index(input_files=filename, index=index)
         if subject:
             make_subject(filenames, output_dir)
 
@@ -408,7 +408,7 @@ def open_file(filename):
     return open(filename, encoding="cp932", errors="ignore")
 
 
-def make_index(input_files, output_dir, index):
+def make_index(input_files, index):
     index_file = index
     if os.path.exists(index_file):
         logging.info("%s already exists. Adding new threads ..." % index_file)
@@ -417,19 +417,18 @@ def make_index(input_files, output_dir, index):
             existing_threads = existing_threads.splitlines()
     else:
         existing_threads = []
-
-    output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
-        "Transitional//EN\">\n" \
-        "<html>\n" \
-        "<head>\n" \
-        "<meta http-equiv=\"Content-Type\" content=\"text/html>" \
-        "<meta http-equiv=\"Content-Style-Type\" content=\"text/css\">\n" \
-        "<title>BBS_log</title>\n" \
-        "</head>\n" \
-        "<body bgcolor=\"#efefef\" text=\"black\" link=\"blue\" " \
-        "alink=\"red\" vlink=\"#660099\">\n" \
-        "<div style=\"margin-bottom:0.5em;\"></div>\n" \
-        "<div style=\"margin-bottom:1em;\">\n"
+    
+    index_title = index_file.replace(".html", "")
+    output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n"
+    output += "<html>\n"
+    output += "<head>\n"
+    output += get_gtag_code()
+    output += "<meta http-equiv=\"Content-Type\" content=\"text/html><meta http-equiv=\"Content-Style-Type\" content=\"text/css\">\n"
+    output += f"<title>{index_title}</title>\n"
+    output += "</head>\n"
+    output += "<body bgcolor=\"#efefef\" text=\"black\" link=\"blue\" alink=\"red\" vlink=\"#660099\">\n"
+    output += "<div style=\"margin-bottom:0.5em;\"></div>\n"
+    output += "<div style=\"margin-bottom:1em;\">\n"
 
     number = 1
     for filename in input_files:
@@ -502,6 +501,14 @@ def make_subject(input_files, output_dir):
         return False
 
     return True
+
+
+def get_gtag_code():
+    try:
+        with open('code.txt') as f:
+            return f.read()
+    except FileNotFoundError:
+        return ''
 
 
 def get_title(line):
