@@ -11,7 +11,6 @@ CHECK_INTERVEL = 3600
 
 def git_push():
     print('git push...')
-
     cmd = ['git', 'add', '.']
     proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print(proc.stdout.decode('utf8'))
@@ -23,7 +22,6 @@ def git_push():
     cmd = ['git', 'push', 'origin', 'master']
     proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print(proc.stdout.decode('utf8'))
-
     print('git_push done...')
 
 
@@ -39,7 +37,7 @@ def dat_2_html(path, dats):
         else:
             dat_months[dat_month].append(dat)
     print(dat_months)
-    
+
     for k, v in dat_months.items():
         sys.argv = ['',]
         sys.argv.append('--index')
@@ -54,7 +52,7 @@ def dat_2_html(path, dats):
 def make_root_index(path):
     htmls = list(pathlib.Path(path).glob('*.html'))
     htmls.sort(reverse=True)
-    
+
     output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
         "Transitional//EN\">\n" \
         "<html>\n" \
@@ -67,17 +65,18 @@ def make_root_index(path):
         "alink=\"red\" vlink=\"#660099\">\n" \
         "<div style=\"margin-bottom:0.5em;\"></div>\n" \
         "<div style=\"margin-bottom:1em;\">\n"
-    
+
     for html in htmls:
         if html.name == 'index.html':
             continue
         output += f'<a href="{html.name}">{html.stem}</a><br>\n'
-    
+
     output += "</div>\n</body>\n</html>\n"
     print('Generating root index file')
     with open(f'{path}/index.html', mode='w', encoding='utf-8', newline='\n') as f:
         f.write(output)
-    
+
+
 def load_dat_kakolog_data(path):
     if not os.path.isfile(f'{path}/{DAT_KAKOLOG_DATA}'):
         return set()
@@ -93,12 +92,16 @@ def save_dat_kakolog_data(path, obj):
         obj.sort()
         f.write('\n'.join(obj))
 
-def main()
+
+def main():
     while True:
         with open('boards.txt') as f:
             check_boards = f.read().splitlines()
             
         for check_board in check_boards:
+            os.makedirs(f'{check_board}/dat', exist_ok=True)
+            os.makedirs(f'{check_board}/html', exist_ok=True)
+            
             copy_src = 'X:/python_tools/5ch_scrape'
             copy_dst = f'{check_board}/dat'
     
