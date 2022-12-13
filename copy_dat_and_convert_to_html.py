@@ -4,12 +4,28 @@ import shutil
 import time
 import datetime
 import sys
+import subprocess
 
 DAT_KAKOLOG_DATA = 'dat_kakolog.txt'
 CHECK_INTERVEL = 3600
 
 def git_push():
-    pass
+    print('git push...')
+
+    cmd = ['git', 'add', '.']
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(proc.stdout.decode('utf8'))
+
+    cmd = ['git', 'commit', '-a', '-m', 'Update']
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(proc.stdout.decode('utf8'))
+
+    cmd = ['git', 'push', 'origin', 'master']
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(proc.stdout.decode('utf8'))
+
+    print('git_push done...')
+
 
 def dat_2_html(path, dats):
     # datを年-月ごとに区切る
@@ -133,6 +149,7 @@ def main()
             git_push()
             print('wating', CHECK_INTERVEL)
             time.sleep(CHECK_INTERVEL)
+
 
 if __name__ == "__main__":
     main()
