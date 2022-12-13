@@ -319,7 +319,8 @@ class Dat2Html:
             for anker in ankers:
                 anker_target = int(anker.replace('&gt;&gt;', ''))
                 if anker_target in anker_count:
-                    anker_count[anker_target].append(i)
+                    if i not in anker_count[anker_target]:
+                        anker_count[anker_target].append(i)
                 else:
                     anker_count[anker_target] = [i]
         return anker_count
@@ -398,7 +399,7 @@ def sort_nicely(l):
     """
     convert = lambda text: int(text) if text.isdigit() else text
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
-    return l.sort(key=alphanum_key, reverse=True)
+    return l.sort(key=alphanum_key)
 
 
 def open_file(filename):
@@ -413,8 +414,9 @@ def make_index(input_files, output_dir, index):
         logging.info("%s already exists. Adding new threads ..." % index_file)
         with open(index_file, encoding='utf-8') as f:
             existing_threads = f.read().split('<div style="margin-bottom:1em;">\n')[1].split('</div>')[0]
+            existing_threads = existing_threads.splitlines()
     else:
-        existing_threads = ''
+        existing_threads = []
 
     output = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 " \
         "Transitional//EN\">\n" \
@@ -438,14 +440,22 @@ def make_index(input_files, output_dir, index):
             dat_path = os.path.basename(filename)
             html_path = os.path.basename(filename).replace(".dat", ".html")
             count = len(open_file(filename).readlines())
-            output += (" %s / <a href=\"html/%s\">html</a> / <a href=\"dat/%s\">dat</a> / %s(%s)<br>\n"
-                        % (date_time, html_path, dat_path, title, count))
+            
+            for i, line in enumerate(existing_threads):
+                if html_path in line:
+                    existing_threads[i] = (" %s / <a href=\"html/%s\">html</a> / <a href=\"dat/%s\">dat</a> / %s(%s)<br>"
+                                            % (date_time, html_path, dat_path, title, count))
+                    break
+            else:
+                existing_threads.append(" %s / <a href=\"html/%s\">html</a> / <a href=\"dat/%s\">dat</a> / %s(%s)<br>"
+                                        % (date_time, html_path, dat_path, title, count))
             number += 1
         except UnicodeDecodeError:
             logging.warning("UnicodeDecodeError %s ..." % filename)
             continue
-
-    output += existing_threads
+    
+    existing_threads.sort(reverse=True)
+    output += "\n".join(existing_threads) + "\n"
     output += "</div>\n</body>\n</html>\n"
 
     logging.info("Generating %s" % index_file)
