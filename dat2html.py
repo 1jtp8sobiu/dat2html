@@ -77,14 +77,19 @@ class Dat2Html:
 
             name2 = "<font color=green><b>%s</b></font>" % name
             if email != "":
-                name2 = "<font color=blue><b>%s</b></font> [%s]" % (name, email)
+                name2 = '<font color=blue><b>%s</b></font><font size="2"> %s</font>' % (name, email)
             if self.template_dir == "*text*":
                 name2 = "%s" % name
             if self.template_dir == "*text*" and email != "":
                 name2 = ("%s E-mail:%s" %
                          (name.replace("<b>", "").replace("</b>", ""), email))
-            if id in id_count and id_count[id] > 1:
-                date += f'<font size="2"> ({id_count[id]}回)</font>'
+            if id in id_count:
+                if id_count[id] >= 10:
+                    date += f'<font size="2" color="red"> {id_count[id]}回</font>'
+                elif id_count[id] >= 5:
+                    date += f'<font size="2" color="#FF0099"> {id_count[id]}回</font>'
+                elif id_count[id] > 1:
+                    date += f'<font size="2"> {id_count[id]}回</font>'
 
             output += (self.template_body %
                        {"number": number, "name": name, "email": email,
@@ -200,7 +205,7 @@ class Dat2Html:
             s += "<html>\n"
             s += "<head>\n" 
             s += get_gtag_code()
-            s += "<meta http-equiv=\"Content-Type\" content=\"text/html><meta name=\"Author\" content=\"%(filename)s\">\n"
+            s += "<meta http-equiv=\"Content-Type\" content=\"text/html\"><meta name=\"Author\" content=\"%(filename)s\">\n"
             s += "<title>%(title)s</title>\n"
             s += "</head>\n"
             s += "<body bgcolor=#efefef text=black link=blue alink=red vlink=#660099>\n"
