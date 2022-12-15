@@ -45,6 +45,7 @@ class Dat2Html:
         }
 
         anker_count = self.get_anker_count(lines)
+        id_count = self.get_id_count(lines)
         output += self.template_header % params
         number = 1
         for line in lines:
@@ -52,6 +53,11 @@ class Dat2Html:
                 name, email, date, message = line.split("<>")[:4]
             except ValueError:
                 return None
+
+            if "ID:" in date:
+                id = date.split("ID:")[1]
+            else:
+                id = ""
 
             if self.template_dir == "*text*":
                 message = self.html2text(message)
@@ -77,6 +83,8 @@ class Dat2Html:
             if self.template_dir == "*text*" and email != "":
                 name2 = ("%s E-mail:%s" %
                          (name.replace("<b>", "").replace("</b>", ""), email))
+            if id in id_count and id_count[id] > 1:
+                date += f'<font size="2"> ({id_count[id]}回)</font>'
 
             output += (self.template_body %
                        {"number": number, "name": name, "email": email,
@@ -339,6 +347,20 @@ class Dat2Html:
                 else:
                     anker_count[anker_target] = [i]
         return anker_count
+
+    def get_id_count(self, lines):
+        id_count = {}
+        for line in lines:
+            try:
+                id = line.split('<>')[2].split('ID:')[1]
+            except IndexError:
+                continue
+
+            if id in id_count:
+                id_count[id] += 1
+            else:
+                id_count[id] = 1
+        return id_count
 
     def get_skin_path(self):
         skin_path = ""
